@@ -7,6 +7,9 @@ import MessageInput from "@/components/message-input"
 import UserProfileModal from "@/components/user-profile-modal"
 import io from "socket.io-client"
 
+// Replace with the deployed backend URL
+const socket = io("https://nyx-dp9x.onrender.com") 
+
 export type Message = {
   id: string
   content: string
@@ -14,8 +17,6 @@ export type Message = {
   timestamp: Date
   isSystem?: boolean
 }
-
-const socket = io("http://localhost:5000") // Ensure this matches your backend's URL
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([

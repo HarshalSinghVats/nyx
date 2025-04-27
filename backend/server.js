@@ -5,17 +5,23 @@ const cors = require('cors');  // Import the cors package
 
 const app = express();
 const server = http.createServer(app);
+
+// Use dynamic URL based on environment
+const frontendUrl = process.env.NODE_ENV === 'production'
+  ? 'https://nyx-steel.vercel.app'  // Frontend URL for production
+  : 'http://localhost:3000';  // Frontend URL for local development
+
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:3000",  // Allow requests from your frontend
-    methods: ["GET", "POST"],        // Allow these methods
-  }
+    origin: frontendUrl,  // Allow frontend URLs dynamically based on environment
+    methods: ['GET', 'POST'],
+  },
 });
 
 // Enable CORS for your express app
 app.use(cors({
-  origin: 'http://localhost:3000',   // Allow frontend at localhost:3000
-  methods: ['GET', 'POST'],         // Allow these methods
+  origin: frontendUrl,  // Use dynamic URL for CORS
+  methods: ['GET', 'POST'],
 }));
 
 io.on('connection', (socket) => {
@@ -23,7 +29,7 @@ io.on('connection', (socket) => {
 
   // Listen for incoming chat messages
   socket.on('chat message', (msg) => {
-    console.log('Received message from user:', msg);  // Log the message received
+    console.log('Received message from user:', msg);
 
     // Send a confirmation back to the sender that the message was received
     socket.emit('message_received', {
@@ -31,15 +37,11 @@ io.on('connection', (socket) => {
       sender: msg.sender,
       timestamp: new Date(),
     });
-    console.log('Sent message received confirmation:', msg);  // Log the confirmation sent
+    console.log('Sent message received confirmation:', msg);
 
     // Broadcast the message to all other users (excluding the sender)
     socket.broadcast.emit('chat message', msg);
-    console.log('Broadcasting message to other users:', msg); // Log the broadcasting action
-
-    // Optionally, if you want to send the message to all clients (including the sender)
-    // io.emit('chat message', msg);  // This sends the message to all clients, including the sender
-    // console.log('Broadcasting message to all clients:', msg); // Log the broadcasting to all clients
+    console.log('Broadcasting message to other users:', msg);
   });
 
   socket.on('disconnect', () => {
@@ -47,6 +49,8 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(5000, () => {
-  console.log('Server running on http://localhost:5000');
+// Use environment variable for the port in production or fallback to 5000
+const port = process.env.PORT || 5000;
+server.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
 });
