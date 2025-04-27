@@ -8,7 +8,7 @@ import UserProfileModal from "@/components/user-profile-modal"
 import io from "socket.io-client"
 
 // Replace with the deployed backend URL
-const socket = io("https://nyx-dp9x.onrender.com") 
+const socket = io("https://nyx-dp9x.onrender.com")
 
 export type Message = {
   id: string
@@ -113,11 +113,13 @@ export default function ChatPage() {
       <Header username={username ?? ""} />
 
       <main className="flex-1 overflow-hidden flex flex-col p-4">
+        {/* Message container with scrolling */}
         <div className="flex-1 overflow-y-auto pr-2">
           <MessageList messages={messages} loading={loading} username={username ?? ""} />
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Input container fixed to the bottom */}
         <MessageInput onSendMessage={handleSendMessage} disabled={!username || loading} />
       </main>
 
